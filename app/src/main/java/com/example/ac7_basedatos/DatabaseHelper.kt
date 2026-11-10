@@ -14,7 +14,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
 
     ) {
     companion object{
-        private const val DATABASE_NAME = "musica.db"
+        private const val DATABASE_NAME = "chappie.db"
         private const val DATABASE_VERSION = 1
         private const val TABLE_USUARIOS = "usuarios"
 
@@ -79,6 +79,4 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(
         db.close()
         return usuarioEncontrado
     }
-
-
 }
