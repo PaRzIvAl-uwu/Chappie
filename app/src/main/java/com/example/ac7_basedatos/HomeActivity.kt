@@ -1,5 +1,6 @@
 package com.example.ac7_basedatos
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -95,6 +96,21 @@ class HomeActivity : AppCompatActivity() {
             Glide.with(this)
                 .load(producto.thumbnail)
                 .into(imgProducto)
+            //pasar informacion a otra pantalla
+            vista.setOnClickListener {
+                val nombre = producto.title
+                if(nombre != null){
+                    val intent = Intent(this@HomeActivity, DetailsActivity::class.java)
+                    intent.putExtra("ID_PRODUCTO", producto.id)
+                    intent.putExtra("NOMBRE_PRODUCTO", nombre)
+                    intent.putExtra("MARCA_PRODUCTO", producto.brand)
+                    intent.putExtra("PRECIO_PRODUCTO", producto.precioFinal())
+                    intent.putExtra("IMAGEN_PRODUCTO", producto.thumbnail)
+                    startActivity(intent)
+
+                }
+            }
+
             contenedor.addView(vista)
         }
     }
