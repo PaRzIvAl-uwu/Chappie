@@ -12,10 +12,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.credentials.CredentialManager
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.ac7_basedatos.model.Producto
 import com.example.ac7_basedatos.model.ProductosResponse
 import com.example.ac7_basedatos.network.RetrofitClient
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -25,6 +30,11 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var contenedorSmartphones: LinearLayout
     private lateinit var contenedorLaptops: LinearLayout
     private lateinit var contenedorRelojes: LinearLayout
+
+    private lateinit var bottomNavigation: BottomNavigationView
+
+    private lateinit var auth: FirebaseAuth
+    private lateinit var credentialManager : CredentialManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +50,11 @@ class HomeActivity : AppCompatActivity() {
         contenedorSmartphones = findViewById(R.id.contenedorSmartphones)
         contenedorLaptops = findViewById(R.id.contenedorLaptops)
         contenedorRelojes = findViewById(R.id.contenedorRelojes)
+
+        bottomNavigation = findViewById(R.id.bottomNavigation)
+
+        auth = FirebaseAuth.getInstance()
+        credentialManager = CredentialManager.create(this)
 
         obtenerProductos("smartphones", contenedorSmartphones)
         obtenerProductos("laptops", contenedorLaptops)
@@ -112,6 +127,53 @@ class HomeActivity : AppCompatActivity() {
             }
 
             contenedor.addView(vista)
+        }
+    }
+
+    //MÉTODO PARA USAR EL MENU DE NAVEGACIÓN
+    private fun menuNavegacion(){
+        //indicar cual es el item seleccionado
+        bottomNavigation.selectedItemId = R.id.nav_inicio
+
+        bottomNavigation.setOnItemSelectedListener { item ->
+            when(item.itemId){
+                R.id.nav_inicio ->{
+                    true
+                }
+                R.id.nav_favoritos ->{
+                    val intent = Intent(this, FavoriteActivity::class.java)
+                    startActivity(intent)
+                    true
+                }
+
+                R.id.nav_salir ->{
+                    cerrarSesionGoogle()
+                    true
+
+                }
+                else -> false
+            }
+        }
+    }
+
+    //metodo para cerrar sesion
+    private fun cerrarSesionGoogle(){
+        auth.signOut()
+
+        lifecycleScope.launch {
+            try{
+                credentialManager.clearCredentialState(
+                    androidx.credentials.ClearCredentialStateRequest()
+                )
+            }catch (e: Exception){
+                Toast.makeText(this@HomeActivity, "Error al cerrar sesion", Toast.LENGTH_SHORT).show()
+            }
+            val intent= Intent(this@HomeActivity, MainActivity::class.java)
+
+            //indicar que se borre toda la info y la aplicacion comience desde 0
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+            startActivity(intent)
         }
     }
 }

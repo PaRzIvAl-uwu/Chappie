@@ -162,5 +162,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    //METODO PARA MANTENER LAS SESIONES ACTIVAS
+    override fun onStart() {
+        super.onStart()
 
+        //info del usuario actual
+        val usuarioActual = auth.currentUser
+        if(usuarioActual != null){
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+    }
 }
